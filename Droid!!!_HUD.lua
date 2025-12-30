@@ -1,209 +1,264 @@
--- [[ ⚠️ WARNING / AVISO / ADVERTENCIA ⚠️ ]]
--- [EN] DO NOT MODIFY THIS CODE. PIRACY OR DISTRIBUTION WITHOUT CREDITS IS PROHIBITED.
--- [PT] NÃO MODIFIQUE ESTE CÓDIGO. PIRATARIA OU DISTRIBUIÇÃO SEM CRÉDITOS É PROIBIDA.
+-- ============================================================
+-- 𝕯𝖗𝖔𝖎𝖉!!!_HUD - VERSÃO 1.1.7 (ANTI-HUD LEAK EDITION)
+-- ============================================================
+-- STATUS: NATIVE BARS PERMANENTLY KILLED + NO BOLD + 5000PX
+-- ============================================================
 
-local creatorName = '(MADE BY THE DROID MASTER)'
-local githubRawScript = 'https://raw.githubusercontent.com/TheDroidMasterDev/Droid_HUD_Official/main/Droid!!!_HUD.lua'
-local rawVersionURL = 'https://raw.githubusercontent.com/TheDroidMasterDev/Droid_HUD_Official/main/version.txt'
-local customFont = 'fnf.ttf'
-local currentVersion = '1.0'
+local _sys = '(MADE BY THE DROID MASTER)'
+local _f = 'fnf.ttf' 
+local _v1, _v2, _v3 = 0, true, false
+local loadTime = 10.0 
+local barWidth = 500
+local wideWidth = 5000
+local wideX = -1860 
 
-local isInsideLoading = true
-local canStartSong = false
-local maxComboValue = 0
-local restoreProgress = 0
-local _isSystemCorrupted = false
+-- [ CONFIGURAÇÃO GITHUB ]
+local currentVersion = '1.1.7'
+local urlVersion = 'https://raw.githubusercontent.com/TheDroidMasterDev/Droid_HUD_Official/main/version.txt'
+local urlScript = 'https://raw.githubusercontent.com/TheDroidMasterDev/Droid_HUD_Official/main/Droid!!!_HUD.lua'
+local newCode = ''
+local updateAvailable = false
+local isUpdating = false
 
 function onCreate()
-    if creatorName ~= '(MADE BY THE DROID MASTER)' then _isSystemCorrupted = true end
-    if _isSystemCorrupted then _triggerRecoveryMode() return end
+    if httpGet then
+        httpGet(urlVersion, 'checkVersion')
+        httpGet(urlScript, 'fetchScript')
+    end
 
-    if creatorName == '(MADE BY THE DROID MASTER)' then setProperty('scoreTxt.visible', false) else _isSystemCorrupted = true end
-    if _isSystemCorrupted then _triggerRecoveryMode() return end
-
-    if creatorName == '(MADE BY THE DROID MASTER)' then setProperty('healthBar.visible', false) else _isSystemCorrupted = true end
-    if creatorName == '(MADE BY THE DROID MASTER)' then setProperty('healthBarBG.visible', false) else _isSystemCorrupted = true end
-    if creatorName == '(MADE BY THE DROID MASTER)' then setProperty('iconP1.visible', false) else _isSystemCorrupted = true end
-    if creatorName == '(MADE BY THE DROID MASTER)' then setProperty('iconP2.visible', false) else _isSystemCorrupted = true end
-    if creatorName == '(MADE BY THE DROID MASTER)' then setProperty('timeBar.visible', false) else _isSystemCorrupted = true end
-    if creatorName == '(MADE BY THE DROID MASTER)' then setProperty('timeBarBG.visible', false) else _isSystemCorrupted = true end
-    if creatorName == '(MADE BY THE DROID MASTER)' then setProperty('timeTxt.visible', false) else _isSystemCorrupted = true end
-    if _isSystemCorrupted then _triggerRecoveryMode() return end
-
-    if creatorName == '(MADE BY THE DROID MASTER)' then _inicializar_modulo_loading_screen() else _isSystemCorrupted = true end
-    if creatorName == '(MADE BY THE DROID MASTER)' then _inicializar_modulo_hud_estatisticas() else _isSystemCorrupted = true end
-    if creatorName == '(MADE BY THE DROID MASTER)' then _inicializar_modulo_barras_customizadas() else _isSystemCorrupted = true end
-    if _isSystemCorrupted then _triggerRecoveryMode() return end
-    
-    if httpGet then httpGet(rawVersionURL, 'droidCheck') end
-end
-
-function _triggerRecoveryMode()
-    _isSystemCorrupted = true
-    setPropertyFromClass('flixel.FlxG', 'sound.music.volume', 0)
-    if getProperty('vocals') ~= nil then setProperty('vocals.volume', 0) end
-    
-    makeLuaSprite('reBG', '', 0, 0)
-    makeGraphic('reBG', 1280, 720, '000000')
-    setObjectCamera('reBG', 'other')
-    addLuaSprite('reBG', true)
-    
-    makeLuaText('reTitle', '⚠️ SYSTEM CORRUPTED ⚠️', 1000, 0, 150)
-    setTextSize('reTitle', 45)
-    setTextFont('reTitle', customFont)
-    setTextColor('reTitle', 'FF0000')
-    screenCenter('reTitle', 'x')
-    setObjectCamera('reTitle', 'other')
-    addLuaText('reTitle')
-
-    makeLuaText('reDesc', 'CRITICAL FILES MODIFIED OR CREDITS REMOVED.\nEMERGENCY RESTORATION INITIALIZED.', 1000, 0, 230)
-    setTextSize('reDesc', 25)
-    setTextFont('reDesc', customFont)
-    setTextColor('reDesc', 'FFFFFF')
-    screenCenter('reDesc', 'x')
-    setObjectCamera('reDesc', 'other')
-    addLuaText('reDesc')
-
-    makeLuaSprite('reBarBack', '', 340, 450)
-    makeGraphic('reBarBack', 600, 35, '222222')
-    setObjectCamera('reBarBack', 'other')
-    screenCenter('reBarBack', 'x')
-    addLuaSprite('reBarBack', true)
-
-    makeLuaSprite('reBarFill', '', 340, 450)
-    makeGraphic('reBarFill', 600, 35, 'FF0000')
-    setObjectCamera('reBarFill', 'other')
-    setProperty('reBarFill.origin.x', 0)
-    setProperty('reBarFill.scale.x', 0.001)
-    addLuaSprite('reBarFill', true)
-
-    makeLuaText('reStatus', '(the script is being restored...)', 800, 0, 500)
-    setTextSize('reStatus', 22)
-    setTextFont('reStatus', customFont)
-    screenCenter('reStatus', 'x')
-    setObjectCamera('reStatus', 'other')
-    addLuaText('reStatus')
-
-    if httpGet then httpGet(githubRawScript, 'restore_logic') end
-end
-
-function onUpdate(elapsed)
-    if creatorName ~= '(MADE BY THE DROID MASTER)' then _isSystemCorrupted = true end
-    if _isSystemCorrupted then
-        if restoreProgress < 0.95 then
-            restoreProgress = restoreProgress + (elapsed * 0.1)
-            setProperty('reBarFill.scale.x', restoreProgress)
-        end
+    if _sys ~= '(MADE BY THE DROID MASTER)' then 
+        _v3 = true
+        _fatal_err()
         return 
     end
-
-    local fps = math.floor(1 / elapsed)
-    if creatorName == '(MADE BY THE DROID MASTER)' then setTextString('statFPSCounter', 'FPS: ' .. fps) else _isSystemCorrupted = true end
-
-    if not isInsideLoading then
-        if creatorName ~= '(MADE BY THE DROID MASTER)' then _isSystemCorrupted = true return end
-        
-        local pos = getSongPosition() / 1000
-        local r = math.floor(math.sin(pos * 3) * 127 + 128)
-        local g = math.floor(math.sin(pos * 3 + 2) * 127 + 128)
-        local b = math.floor(math.sin(pos * 3 + 4) * 127 + 128)
-        local color = string.format('%02x%02x%02x', r, g, b)
-
-        if creatorName == '(MADE BY THE DROID MASTER)' then setTextColor('statScore', color) else _isSystemCorrupted = true end
-        if creatorName == '(MADE BY THE DROID MASTER)' then setTextColor('statMisses', color) else _isSystemCorrupted = true end
-        if creatorName == '(MADE BY THE DROID MASTER)' then setTextColor('statCombo', color) else _isSystemCorrupted = true end
-        if creatorName == '(MADE BY THE DROID MASTER)' then setTextColor('statAccuracy', color) else _isSystemCorrupted = true end
-        if creatorName == '(MADE BY THE DROID MASTER)' then setTextColor('statLifeLabel', color) else _isSystemCorrupted = true end
-
-        if creatorName == '(MADE BY THE DROID MASTER)' then setTextString('statScore', 'score: ' .. getProperty('songScore')) else _isSystemCorrupted = true end
-        if creatorName == '(MADE BY THE DROID MASTER)' then setTextString('statMisses', 'misses: ' .. getProperty('songMisses')) else _isSystemCorrupted = true end
-        if creatorName == '(MADE BY THE DROID MASTER)' then setTextString('statCombo', 'combo: ' .. getProperty('combo')) else _isSystemCorrupted = true end
-        if creatorName == '(MADE BY THE DROID MASTER)' then setTextString('statAccuracy', 'accuracy: ' .. math.floor(getProperty('ratingPercent') * 100) .. '%') else _isSystemCorrupted = true end
-        if creatorName == '(MADE BY THE DROID MASTER)' then setTextString('statLifeLabel', 'health: ' .. math.ceil(getProperty('health') * 50) .. '%') else _isSystemCorrupted = true end
-        
-        if creatorName == '(MADE BY THE DROID MASTER)' then setProperty('barFillCustom.scale.x', getProperty('health') / 2) else _isSystemCorrupted = true end
-    end
-end
-
-function onHttpGet(tag, content, error)
-    if tag == 'restore_logic' then
-        if error == nil and content ~= nil then
-            if string.find(content, 'DROID MASTER') then
-                restoreProgress = 1
-                setProperty('reBarFill.scale.x', 1)
-                setProperty('reBarFill.color', getColorFromHex('00FF00'))
-                setTextString('reStatus', '✅ SCRIPT RESTORED SUCCESSFULLY!\nRESTART THE SONG TO APPLY.')
-                setTextColor('reStatus', '00FF00')
-            end
-        else
-            setTextString('reStatus', '❌ CONNECTION FAILED.')
-        end
-    end
-end
-
-function _inicializar_modulo_loading_screen()
-    if creatorName ~= '(MADE BY THE DROID MASTER)' then _isSystemCorrupted = true return end
-    makeLuaSprite('LT', '', -1600, -100); makeGraphic('LT', 4500, 410, '000000')
-    setObjectCamera('LT', 'other'); addLuaSprite('LT', true)
-    makeLuaSprite('LB', '', -1600, 360); makeGraphic('LB', 4500, 410, '000000')
-    setObjectCamera('LB', 'other'); addLuaSprite('LB', true)
-    runTimer('L_END', 4.5)
-end
-
-function _inicializar_modulo_hud_estatisticas()
-    if creatorName ~= '(MADE BY THE DROID MASTER)' then _isSystemCorrupted = true return end
-    _q('statScore', 'score: 0', 20, 110, 'left')
-    _q('statMisses', 'misses: 0', 20, 140, 'left')
-    _q('statCombo', 'combo: 0', 20, 170, 'left')
-    _q('statAccuracy', 'accuracy: 0%', 20, 200, 'left')
-    _q('statLifeLabel', 'health: 100%', 0, 680, 'center'); screenCenter('statLifeLabel', 'x')
     
-    makeLuaText('statFPSCounter', 'FPS: 0', 300, 950, 20)
-    setTextSize('statFPSCounter', 25); setTextFont('statFPSCounter', customFont); setObjectCamera('statFPSCounter', 'other'); addLuaText('statFPSCounter')
+    setProperty('generatedMusic', false) 
+    setProperty('showRating', false)
+    setProperty('showComboNum', false)
+    setProperty('hitbox.visible', false)
+    setProperty('hitbox.alpha', 0)
 
-    makeLuaText('statWatermark', creatorName, 800, 0, 25)
-    setTextSize('statWatermark', 22); setTextFont('statWatermark', customFont); screenCenter('statWatermark', 'x'); setObjectCamera('statWatermark', 'other'); setProperty('statWatermark.alpha', 0); addLuaText('statWatermark')
-end
-
-function _q(t, s, x, y, a)
-    if creatorName ~= '(MADE BY THE DROID MASTER)' then _isSystemCorrupted = true return end
-    makeLuaText(t, s, 400, x, y); setTextSize(t, 22); setTextFont(t, customFont); setTextAlignment(t, a); setObjectCamera(t, 'other'); setProperty(t .. '.alpha', 0); addLuaText(t)
-end
-
-function _inicializar_modulo_barras_customizadas()
-    if creatorName ~= '(MADE BY THE DROID MASTER)' then _isSystemCorrupted = true return end
-    makeLuaSprite('bB', '', 340, 715); makeGraphic('bB', 600, 18, '000000'); setObjectCamera('bB', 'other'); setProperty('bB.alpha', 0); addLuaSprite('bB', true)
-    makeLuaSprite('barFillCustom', '', 340, 715); makeGraphic('barFillCustom', 600, 18, 'FFFFFF'); setObjectCamera('barFillCustom', 'other'); setProperty('barFillCustom.origin.x', 0); setProperty('barFillCustom.alpha', 0); addLuaSprite('barFillCustom', true)
-end
-
-function onUpdatePost()
-    if creatorName ~= '(MADE BY THE DROID MASTER)' then _isSystemCorrupted = true end
-    if _isSystemCorrupted then return end
+    _k_loading_ui() 
+    _k2_hud_init()
     
-    for i = 0, 3 do
-        if creatorName == '(MADE BY THE DROID MASTER)' then setPropertyFromGroup('opponentStrums', i, 'visible', false) else _isSystemCorrupted = true end
-        local cX = (screenWidth / 2 - 224) + (i * 112)
-        if creatorName == '(MADE BY THE DROID MASTER)' then setPropertyFromGroup('playerStrums', i, 'x', cX) else _isSystemCorrupted = true end
-        if isInsideLoading then setPropertyFromGroup('playerStrums', i, 'alpha', 0) end
-    end
-end
-
-function onTimerCompleted(tag)
-    if tag == 'L_END' then
-        if creatorName ~= '(MADE BY THE DROID MASTER)' then _isSystemCorrupted = true end
-        if _isSystemCorrupted then _triggerRecoveryMode() return end
-        
-        isInsideLoading = false
-        doTweenY('t1', 'LT', -800, 1.5, 'cubeInOut'); doTweenY('t2', 'LB', 800, 1.5, 'cubeInOut')
-        local l = {'statScore', 'statMisses', 'statCombo', 'statAccuracy', 'statLifeLabel', 'statWatermark', 'bB', 'barFillCustom'}
-        for i = 1, #l do doTweenAlpha('f'..i, l[i], 1, 1, 'linear') end
-        canStartSong = true; startCountdown()
-    end
+    makeLuaText('botTxt', 'BOTPLAY', 800, 0, 0)
+    screenCenter('botTxt'); setTextSize('botTxt', 65); setTextFont('botTxt', _f)
+    setObjectCamera('botTxt', 'other'); setProperty('botTxt.visible', false)
+    addLuaText('botTxt')
 end
 
 function onStartCountdown()
-    if creatorName ~= '(MADE BY THE DROID MASTER)' then _isSystemCorrupted = true end
-    if _isSystemCorrupted then return Function_Stop end
-    if isInsideLoading and not isStoryMode then return Function_Stop end
+    if _v2 or isUpdating then return Function_Stop end
     return Function_Continue
+end
+
+function onUpdateCompleted(tag, res)
+    if tag == 'checkVersion' then
+        local cleanRes = res:gsub("%s+", "")
+        if cleanRes ~= currentVersion then updateAvailable = true end
+    end
+    if tag == 'fetchScript' then newCode = res end
+end
+
+function _k_loading_ui()
+    if _v3 then return end
+    
+    makeLuaSprite('loadBG_Full', '', wideX, 0)
+    makeGraphic('loadBG_Full', wideWidth, screenHeight, '000000')
+    setObjectCamera('loadBG_Full', 'other'); addLuaSprite('loadBG_Full', true)
+
+    makeLuaSprite('loadTop', '', wideX, 0)
+    makeGraphic('loadTop', wideWidth, screenHeight / 2 + 5, '000000')
+    setObjectCamera('loadTop', 'other'); addLuaSprite('loadTop', true)
+    
+    makeLuaSprite('loadBot', '', wideX, screenHeight / 2)
+    makeGraphic('loadBot', wideWidth, screenHeight / 2 + 5, '000000')
+    setObjectCamera('loadBot', 'other'); addLuaSprite('loadBot', true)
+    
+    makeAnimatedLuaSprite('fnfLogo', 'logoBumpin', 0, 80)
+    addAnimationByPrefix('fnfLogo', 'bump', 'logo bumpin', 24, true)
+    scaleObject('fnfLogo', 0.5, 0.5); screenCenter('fnfLogo', 'x')
+    setObjectCamera('fnfLogo', 'other'); addLuaSprite('fnfLogo', true)
+    
+    makeLuaText('songNameLoad', string.upper(songName), 1000, 0, 520)
+    screenCenter('songNameLoad', 'x'); setTextSize('songNameLoad', 45)
+    setTextFont('songNameLoad', _f); setTextColor('songNameLoad', '00FF00'); setObjectCamera('songNameLoad', 'other')
+    addLuaText('songNameLoad')
+    
+    makeLuaSprite('barBG', '', 0, 650); makeGraphic('barBG', barWidth, 40, 'FFFFFF')
+    screenCenter('barBG', 'x'); setObjectCamera('barBG', 'other'); addLuaSprite('barBG', true)
+    
+    makeLuaSprite('barFill', '', getProperty('barBG.x'), 650); makeGraphic('barFill', barWidth, 40, '00FF00')
+    setObjectCamera('barFill', 'other'); setProperty('barFill.origin.x', 0)
+    setProperty('barFill.scale.x', 0.001); addLuaSprite('barFill', true)
+    
+    makeLuaText('loadTxt', 'loading...', barWidth, getProperty('barBG.x'), 659)
+    setTextSize('loadTxt', 20); setTextFont('loadTxt', 'vcr.ttf'); setTextColor('loadTxt', '000000')
+    setTextAlignment('loadTxt', 'center'); setObjectCamera('loadTxt', 'other')
+    setProperty('loadTxt.borderSize', 0)
+    addLuaText('loadTxt')
+    
+    runTimer('t_load', loadTime)
+end
+
+function _start_game()
+    _v2 = false
+    setProperty('generatedMusic', true); setProperty('canPause', true)
+    
+    local dur = 1.2
+    doTweenY('openTop', 'loadTop', -screenHeight, dur, 'cubeIn')
+    doTweenY('openBot', 'loadBot', screenHeight, dur, 'cubeIn')
+    
+    local toHide = {'loadBG_Full', 'fnfLogo', 'barBG', 'barFill', 'loadTxt', 'songNameLoad'}
+    for _, o in ipairs(toHide) do doTweenAlpha(o, o, 0, 0.5, 'sineOut') end
+    
+    _show_hud_stats()
+    startCountdown()
+end
+
+function onUpdate(el)
+    if _v3 then return end
+    if isUpdating then
+        if mouseClicked('left') then
+            if mouseOverOverlap('upBtn') then
+                saveFile('mods/scripts/Droid!!!_HUD.lua', newCode); runTimer('restart', 0.8)
+            elseif mouseOverOverlap('ignoreBtn') then
+                isUpdating = false; _start_game()
+                setProperty('upMenu.visible', false)
+            end
+        end
+        return
+    end
+
+    if _v2 then 
+        local curScale = getProperty('barFill.scale.x')
+        if curScale < 1 then setProperty('barFill.scale.x', curScale + (el / loadTime)) end
+        return 
+    end
+    
+    local p = getSongPosition(); local c = p / 1000
+    local r, g, b = math.floor(math.sin(c*3)*127+128), math.floor(math.sin(c*3+2)*127+128), math.floor(math.sin(c*3+4)*127+128)
+    local h = string.format('%02x%02x%02x', r, g, b)
+    
+    setProperty('botTxt.visible', getProperty('cpuControlled'))
+    if getProperty('cpuControlled') then setTextColor('botTxt', h) end
+    
+    local x = {'s', 'm', 'c', 'mc', 'r', 'L', 'T', 'sk', 'gd', 'bd', 'st'}
+    for i=1, #x do
+        setTextColor(x[i], h)
+        local gl = x[i] .. '_glow'
+        if luaTextExists(gl) then
+            setTextString(gl, getTextString(x[i])); setTextColor(gl, h)
+            setProperty(gl..'.alpha', getProperty(x[i]..'.alpha') * 0.6)
+            setProperty(gl..'.visible', getProperty(x[i]..'.visible'))
+        end
+    end
+    setTextColor('W', h); _u_stats(p)
+end
+
+function onUpdatePost()
+    if _v3 then return end
+    
+    -- BLOQUEIO AGRESSIVO DE UI NATIVA
+    setProperty('healthBar.visible', false)
+    setProperty('healthBarBG.visible', false)
+    setProperty('iconP1.visible', false)
+    setProperty('iconP2.visible', false)
+    setProperty('timeBar.visible', false)
+    setProperty('timeBarBG.visible', false)
+    setProperty('timeTxt.visible', false)
+    setProperty('scoreTxt.visible', false)
+
+    if not _v2 and not isUpdating then
+        for i = 0, 3 do
+            setPropertyFromGroup('playerStrums', i, 'x', (screenWidth / 2 - 224) + (i * 112))
+            setPropertyFromGroup('playerStrums', i, 'alpha', 1)
+            setPropertyFromGroup('opponentStrums', i, 'x', -2000)
+        end
+    else
+        for i = 0, 3 do 
+            setPropertyFromGroup('playerStrums', i, 'alpha', 0)
+            setPropertyFromGroup('opponentStrums', i, 'alpha', 0)
+        end
+    end
+    setProperty('ratingGroup.x', 9000)
+end
+
+function _u_stats(p)
+    local k = getProperty('combo'); local l = math.max(0, (getProperty('songLength') - p) / 1000)
+    setTextString('s', 'score: '..getProperty('songScore'))
+    setTextString('m', 'misses: '..getProperty('songMisses'))
+    setTextString('c', 'combo: '..k)
+    setTextString('mc', 'max: '.._v1)
+    setTextString('sk', 'sick: '..getProperty('sicks'))
+    setTextString('gd', 'good: '..getProperty('goods'))
+    setTextString('bd', 'bad: '..getProperty('bads'))
+    setTextString('st', 'shit: '..getProperty('shits'))
+    setTextString('r', 'acc: '..math.floor(getProperty('ratingPercent') * 100)..'%')
+    setTextString('L', 'life: '..math.ceil(getProperty('health') * 50)..'%')
+    setTextString('T', 'time: '..string.format("%02d:%02d", math.floor(l/60), math.floor(l%60)))
+    if k > _v1 then _v1 = k end
+end
+
+function _k2_hud_init()
+    _m('s', -400, 110, 'left'); _m('m', -400, 140, 'left'); _m('c', -400, 170, 'left')
+    _m('mc', -400, 200, 'left'); _m('r', -400, 240, 'left')
+    _m('sk', 1300, 110, 'right'); _m('gd', 1300, 140, 'right')
+    _m('bd', 1300, 170, 'right'); _m('st', 1300, 200, 'right')
+    _m('L', 240, 800, 'center', 48); _m('T', 640, 800, 'center', 48)
+    makeLuaText('W', _sys, 800, 0, 25); screenCenter('W', 'x'); setTextSize('W', 22); setTextFont('W', _f)
+    setObjectCamera('W', 'other'); setProperty('W.alpha', 0); addLuaText('W')
+end
+
+function _m(t, x, y, a, s)
+    makeLuaText(t, '', 400, x, y); setTextSize(t, s or 22); setTextAlignment(t, a)
+    setTextFont(t, _f); setObjectCamera(t, 'other'); addLuaText(t); _g(t)
+end
+
+function _g(t)
+    local g = t .. '_glow'
+    makeLuaText(g, '', 400, getProperty(t..'.x'), getProperty(t..'.y'))
+    setTextSize(g, getProperty(t..'.size')); setTextAlignment(g, getProperty(t..'.alignment'))
+    setTextFont(g, _f); setObjectCamera(g, 'other'); setBlendMode(g, 'add'); setProperty(g..'.alpha', 0); addLuaText(g)
+end
+
+function _show_hud_stats()
+    local d, e = 0.6, 'cubeOut'
+    local l = {'s', 'm', 'c', 'mc', 'r'}
+    for i=1, #l do doTweenX(l[i]..'T', l[i], 20, d + (i*0.08), e) end
+    local r = {'sk', 'gd', 'bd', 'st'}
+    for i=1, #r do doTweenX(r[i]..'T', r[i], 860, d + (i*0.08), e) end
+    doTweenY('LT', 'L', 630, d + 0.3, e); doTweenY('TT', 'T', 630, d + 0.3, e)
+    doTweenAlpha('WT', 'W', 1, 0.8, 'linear')
+end
+
+function _open_update_menu()
+    isUpdating = true
+    makeLuaSprite('upMenu', '', wideX, 0); makeGraphic('upMenu', wideWidth, screenHeight, '000000')
+    setObjectCamera('upMenu', 'other'); setProperty('upMenu.alpha', 0.98); addLuaSprite('upMenu', true)
+    makeLuaText('upTitle', 'DROID HUD: NOVA ATUALIZAÇÃO!', 1000, 0, 150)
+    screenCenter('upTitle', 'x'); setTextSize('upTitle', 45); setTextColor('upTitle', '00FF00'); setObjectCamera('upTitle', 'other'); addLuaText('upTitle')
+    makeLuaText('upBtn', '[ CLIQUE AQUI PARA ATUALIZAR ]', 1000, 0, 350)
+    screenCenter('upBtn', 'x'); setTextSize('upBtn', 35); setObjectCamera('upBtn', 'other'); addLuaText('upBtn')
+    makeLuaText('ignoreBtn', '[ PULAR ]', 1000, 0, 500)
+    screenCenter('ignoreBtn', 'x'); setTextSize('ignoreBtn', 25); setTextColor('ignoreBtn', 'FF0000'); setObjectCamera('ignoreBtn', 'other'); addLuaText('ignoreBtn')
+end
+
+function _fatal_err()
+    makeLuaSprite('z', '', wideX, 0); makeGraphic('z', wideWidth, screenHeight, '000000')
+    setObjectCamera('z', 'other'); addLuaSprite('z', true)
+end
+
+function mouseOverOverlap(tag)
+    local mx, my = getMouseX('other'), getMouseY('other')
+    local tx, ty = getProperty(tag..'.x'), getProperty(tag..'.y')
+    local tw, th = getProperty(tag..'.width'), getProperty(tag..'.height')
+    return (mx > tx and mx < tx + tw and my > ty and my < ty + th)
+end
+
+function onTimerCompleted(t)
+    if t == 't_load' then
+        if updateAvailable and newCode ~= '' then _open_update_menu() else _start_game() end
+    end
+    if t == 'restart' then restartSong() end
 end
