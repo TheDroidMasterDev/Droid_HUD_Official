@@ -1,7 +1,7 @@
 -- ============================================================
--- 𝕯𝖗𝖔𝖎𝖉!!!_HUD - VERSÃO 1.1.8 (PRO MASTER EDITION)
+-- 𝕯𝖗𝖔𝖎𝖉!!!_HUD - VERSÃO 1.1.8 (SECURITY & UPDATE PATCH)
 -- ============================================================
--- STATUS: NATIVE BARS KILLED + 5000PX + RECOVERY + UPDATE
+-- STATUS: HUD COMPLETO + SEGURANÇA + AUTO-UPDATE
 -- ============================================================
 
 local _sys = '(MADE BY THE DROID MASTER)'
@@ -19,29 +19,27 @@ local urlScript = 'https://raw.githubusercontent.com/TheDroidMasterDev/Droid_HUD
 local newCode = ''
 local updateAvailable = false
 local isUpdating = false
-local holdTime = 0
+local holdTime = 0 -- Para o bypass de recuperação
 
 function onCreate()
-    -- Checagem de Update e Integridade
+    -- [ SISTEMA DE CONEXÃO ]
     if httpGet then
         httpGet(urlVersion, 'checkVersion')
         httpGet(urlScript, 'fetchScript')
     end
 
+    -- [ CHECAGEM DE INTEGRALIDADE ]
     if _sys ~= '(MADE BY THE DROID MASTER)' then 
         _v3 = true
         _fatal_err()
         return 
     end
     
-    _init_hud_settings()
-end
-
-function _init_hud_settings()
     setProperty('generatedMusic', false) 
     setProperty('showRating', false)
     setProperty('showComboNum', false)
-    setProperty('hitbox.visible', false); setProperty('hitbox.alpha', 0)
+    setProperty('hitbox.visible', false)
+    setProperty('hitbox.alpha', 0)
 
     _k_loading_ui() 
     _k2_hud_init()
@@ -52,140 +50,24 @@ function _init_hud_settings()
     addLuaText('botTxt')
 end
 
--- [ LÓGICA DE UPDATE E RECUPERAÇÃO ]
+function onStartCountdown()
+    if _v2 or isUpdating then return Function_Stop end
+    return Function_Continue
+end
+
 function onUpdateCompleted(tag, res)
     if tag == 'checkVersion' then
         local cleanRes = res:gsub("%s+", "")
         if cleanRes ~= currentVersion then updateAvailable = true end
-    elseif tag == 'fetchScript' then
-        newCode = res
     end
+    if tag == 'fetchScript' then newCode = res end
 end
 
-function onUpdate(el)
-    -- MODO DE RECUPERAÇÃO (Segure o toque por 5s se o HUD travar)
-    if _v3 then
-        if getPropertyFromClass('flixel.FlxG', 'mouse.pressed') then
-            holdTime = holdTime + el
-            if holdTime > 5 then _v3 = false; _start_game() end
-        else holdTime = 0 end
-        return 
-    end
-
-    -- Menu de Update
-    if isUpdating then
-        if mouseClicked('left') then
-            if mouseOverOverlap('upBtn') and newCode ~= '' then
-                saveFile('mods/scripts/Droid!!!_HUD.lua', newCode)
-                setTextString('upBtn', 'ATUALIZADO! REINICIANDO...'); runTimer('restart', 1.0)
-            elseif mouseOverOverlap('ignoreBtn') then
-                isUpdating = false; _start_game()
-            end
-        end
-        return
-    end
-
-    -- Barra de Loading
-    if _v2 then 
-        local curScale = getProperty('barFill.scale.x')
-        if curScale < 1 then setProperty('barFill.scale.x', curScale + (el / loadTime)) end
-        return 
-    end
-    
-    _handle_rgb_and_stats()
-end
-
--- [ SISTEMA DE UI ]
 function _k_loading_ui()
-    makeLuaSprite('loadBG_Full', '', wideX, 0); makeGraphic('loadBG_Full', wideWidth, screenHeight, '000000')
-    setObjectCamera('loadBG_Full', 'other'); addLuaSprite('loadBG_Full', true)
-    
-    makeLuaSprite('loadTop', '', wideX, 0); makeGraphic('loadTop', wideWidth, screenHeight / 2 + 5, '000000')
-    setObjectCamera('loadTop', 'other'); addLuaSprite('loadTop', true)
-    
-    makeLuaSprite('loadBot', '', wideX, screenHeight / 2); makeGraphic('loadBot', wideWidth, screenHeight / 2 + 5, '000000')
-    setObjectCamera('loadBot', 'other'); addLuaSprite('loadBot', true)
-    
-    makeAnimatedLuaSprite('fnfLogo', 'logoBumpin', 0, 80)
-    addAnimationByPrefix('fnfLogo', 'bump', 'logo bumpin', 24, true)
-    scaleObject('fnfLogo', 0.5, 0.5); screenCenter('fnfLogo', 'x'); setObjectCamera('fnfLogo', 'other'); addLuaSprite('fnfLogo', true)
-    
-    makeLuaText('songNameLoad', string.upper(songName), 1000, 0, 520)
-    screenCenter('songNameLoad', 'x'); setTextSize('songNameLoad', 45); setTextFont('songNameLoad', _f)
-    setTextColor('songNameLoad', '00FF00'); setObjectCamera('songNameLoad', 'other'); addLuaText('songNameLoad')
-    
-    makeLuaSprite('barBG', '', 0, 650); makeGraphic('barBG', barWidth, 40, 'FFFFFF')
-    screenCenter('barBG', 'x'); setObjectCamera('barBG', 'other'); addLuaSprite('barBG', true)
-    
-    makeLuaSprite('barFill', '', getProperty('barBG.x'), 650); makeGraphic('barFill', barWidth, 40, '00FF00')
-    setObjectCamera('barFill', 'other'); setProperty('barFill.origin.x', 0); setProperty('barFill.scale.x', 0.001); addLuaSprite('barFill', true)
-    
-    makeLuaText('loadTxt', 'loading...', barWidth, getProperty('barBG.x'), 659)
-    setTextSize('loadTxt', 20); setTextFont('loadTxt', 'vcr.ttf'); setTextColor('loadTxt', '000000')
-    setTextAlignment('loadTxt', 'center'); setObjectCamera('loadTxt', 'other'); setProperty('loadTxt.borderSize', 0); addLuaText('loadTxt')
-    
-    runTimer('t_load', loadTime)
-end
-
-function _start_game()
-    _v2 = false; setProperty('generatedMusic', true); setProperty('canPause', true)
-    doTweenY('openTop', 'loadTop', -screenHeight, 1.2, 'cubeIn')
-    doTweenY('openBot', 'loadBot', screenHeight, 1.2, 'cubeIn')
-    local toHide = {'loadBG_Full', 'fnfLogo', 'barBG', 'barFill', 'loadTxt', 'songNameLoad', 'upMenu', 'upTitle', 'upBtn', 'ignoreBtn'}
-    for _, o in ipairs(toHide) do doTweenAlpha(o, o, 0, 0.5, 'sineOut') end
-    _show_hud_stats(); startCountdown()
-end
-
-function onUpdatePost()
     if _v3 then return end
-    -- KILL NATIVE HUD
-    local h = {'healthBar', 'healthBarBG', 'iconP1', 'iconP2', 'timeBar', 'timeBarBG', 'timeTxt', 'scoreTxt'}
-    for _, obj in ipairs(h) do setProperty(obj..'.visible', false) end
-
-    if not _v2 and not isUpdating then
-        for i = 0, 3 do
-            setPropertyFromGroup('playerStrums', i, 'x', (screenWidth / 2 - 224) + (i * 112))
-            setPropertyFromGroup('playerStrums', i, 'alpha', 1)
-            setPropertyFromGroup('opponentStrums', i, 'x', -2000)
-        end
-    else
-        for i = 0, 3 do setPropertyFromGroup('playerStrums', i, 'alpha', 0) end
-    end
-end
-
-function onTimerCompleted(t)
-    if t == 't_load' then
-        if updateAvailable and newCode ~= '' then _open_update_menu() else _start_game() end
-    elseif t == 'restart' then restartSong() end
-end
-
--- [ FUNÇÕES AUXILIARES ]
-function _open_update_menu()
-    isUpdating = true
-    makeLuaSprite('upMenu', '', wideX, 0); makeGraphic('upMenu', wideWidth, screenHeight, '000000')
-    setObjectCamera('upMenu', 'other'); setProperty('upMenu.alpha', 0.98); addLuaSprite('upMenu', true)
-    makeLuaText('upTitle', 'NOVA ATUALIZAÇÃO DISPONÍVEL!', 1000, 0, 200)
-    screenCenter('upTitle', 'x'); setTextSize('upTitle', 40); setTextColor('upTitle', '00FF00'); setObjectCamera('upTitle', 'other'); addLuaText('upTitle')
-    makeLuaText('upBtn', '[ CLIQUE PARA ATUALIZAR ]', 1000, 0, 400)
-    screenCenter('upBtn', 'x'); setTextSize('upBtn', 30); setObjectCamera('upBtn', 'other'); addLuaText('upBtn')
-    makeLuaText('ignoreBtn', '[ PULAR ]', 1000, 0, 550)
-    screenCenter('ignoreBtn', 'x'); setTextSize('ignoreBtn', 20); setTextColor('ignoreBtn', 'FF0000'); setObjectCamera('ignoreBtn', 'other'); addLuaText('ignoreBtn')
-end
-
-function _fatal_err()
-    makeLuaSprite('z', '', wideX, 0); makeGraphic('z', wideWidth, screenHeight, '000000')
-    setObjectCamera('z', 'other'); addLuaSprite('z', true)
-    makeLuaText('e', 'ERRO DE INTEGRIDADE: CODIGO ALTERADO', 1000, 0, 300)
-    screenCenter('e', 'x'); setTextSize('e', 30); setTextColor('e', 'FF0000'); setObjectCamera('e', 'other'); addLuaText('e')
-end
-
-function mouseOverOverlap(tag)
-    local mx, my = getMouseX('other'), getMouseY('other')
-    local tx, ty, tw, th = getProperty(tag..'.x'), getProperty(tag..'.y'), getProperty(tag..'.width'), getProperty(tag..'.height')
-    return (mx > tx and mx < tx + tw and my > ty and my < ty + th)
-end
-
--- (Mantive suas funções _handle_rgb_and_stats, _u_stats, _k2_hud_init, _m, _g, _show_hud_stats do HUD anterior aqui para não ocupar espaço)
+    
+    makeLuaSprite('loadBG_Full', '', wideX, 0)
+    makeGraphic('loadBG_Full', wideWidth, screenHeight, '000000')
     setObjectCamera('loadBG_Full', 'other'); addLuaSprite('loadBG_Full', true)
 
     makeLuaSprite('loadTop', '', wideX, 0)
@@ -230,7 +112,7 @@ function _start_game()
     doTweenY('openTop', 'loadTop', -screenHeight, dur, 'cubeIn')
     doTweenY('openBot', 'loadBot', screenHeight, dur, 'cubeIn')
     
-    local toHide = {'loadBG_Full', 'fnfLogo', 'barBG', 'barFill', 'loadTxt', 'songNameLoad'}
+    local toHide = {'loadBG_Full', 'fnfLogo', 'barBG', 'barFill', 'loadTxt', 'songNameLoad', 'upMenu', 'upTitle', 'upBtn', 'ignoreBtn'}
     for _, o in ipairs(toHide) do doTweenAlpha(o, o, 0, 0.5, 'sineOut') end
     
     _show_hud_stats()
@@ -238,14 +120,28 @@ function _start_game()
 end
 
 function onUpdate(el)
-    if _v3 then return end
+    -- [ BYPASS DE RECUPERAÇÃO ]
+    if _v3 then
+        if getPropertyFromClass('flixel.FlxG', 'mouse.pressed') then
+            holdTime = holdTime + el
+            if holdTime > 5 then -- Segure 5 segundos para liberar
+                _v3 = false
+                _start_game()
+            end
+        else
+            holdTime = 0
+        end
+        return 
+    end
+
+    -- [ LOGICA DE UPDATE ]
     if isUpdating then
         if mouseClicked('left') then
-            if mouseOverOverlap('upBtn') then
-                saveFile('mods/scripts/Droid!!!_HUD.lua', newCode); runTimer('restart', 0.8)
+            if mouseOverOverlap('upBtn') and newCode ~= '' then
+                saveFile('mods/scripts/Droid!!!_HUD.lua', newCode)
+                setTextString('upBtn', 'CONCLUIDO!'); runTimer('restart', 0.8)
             elseif mouseOverOverlap('ignoreBtn') then
                 isUpdating = false; _start_game()
-                setProperty('upMenu.visible', false)
             end
         end
         return
@@ -257,6 +153,7 @@ function onUpdate(el)
         return 
     end
     
+    -- [ HUD RGB & STATS ]
     local p = getSongPosition(); local c = p / 1000
     local r, g, b = math.floor(math.sin(c*3)*127+128), math.floor(math.sin(c*3+2)*127+128), math.floor(math.sin(c*3+4)*127+128)
     local h = string.format('%02x%02x%02x', r, g, b)
@@ -280,15 +177,11 @@ end
 function onUpdatePost()
     if _v3 then return end
     
-    -- BLOQUEIO AGRESSIVO DE UI NATIVA
-    setProperty('healthBar.visible', false)
-    setProperty('healthBarBG.visible', false)
-    setProperty('iconP1.visible', false)
-    setProperty('iconP2.visible', false)
-    setProperty('timeBar.visible', false)
-    setProperty('timeBarBG.visible', false)
-    setProperty('timeTxt.visible', false)
-    setProperty('scoreTxt.visible', false)
+    -- BLOQUEIO DE UI NATIVA
+    setProperty('healthBar.visible', false); setProperty('healthBarBG.visible', false)
+    setProperty('iconP1.visible', false); setProperty('iconP2.visible', false)
+    setProperty('timeBar.visible', false); setProperty('timeBarBG.visible', false)
+    setProperty('timeTxt.visible', false); setProperty('scoreTxt.visible', false)
 
     if not _v2 and not isUpdating then
         for i = 0, 3 do
@@ -368,12 +261,13 @@ end
 function _fatal_err()
     makeLuaSprite('z', '', wideX, 0); makeGraphic('z', wideWidth, screenHeight, '000000')
     setObjectCamera('z', 'other'); addLuaSprite('z', true)
+    makeLuaText('err', 'MODIFICADO: SEGURE O MEIO DA TELA PARA RECUPERAR', 1000, 0, 300)
+    screenCenter('err', 'x'); setTextSize('err', 30); setTextColor('err', 'FF0000'); setObjectCamera('err', 'other'); addLuaText('err')
 end
 
 function mouseOverOverlap(tag)
     local mx, my = getMouseX('other'), getMouseY('other')
-    local tx, ty = getProperty(tag..'.x'), getProperty(tag..'.y')
-    local tw, th = getProperty(tag..'.width'), getProperty(tag..'.height')
+    local tx, ty, tw, th = getProperty(tag..'.x'), getProperty(tag..'.y'), getProperty(tag..'.width'), getProperty(tag..'.height')
     return (mx > tx and mx < tx + tw and my > ty and my < ty + th)
 end
 
